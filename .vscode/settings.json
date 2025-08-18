@@ -1,0 +1,7 @@
+{
+    // Controls the font family.
+	"editor.fontFamily": "'JetBrains Mono', 'Droid Sans Mono', 'monospace', monospace",
+
+	// Configures font ligatures or font features. Can be either a boolean to enable/disable ligatures or a string for the value of the CSS 'font-feature-settings' property.
+	"editor.fontLigatures": true,
+}
