@@ -1,11 +1,13 @@
 import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { theme } from "../theme";
+import AntDesign from "@expo/vector-icons/AntDesign";
 
 type Props = {
   name: string;
+  isCompleted?: boolean;
 };
 
-export default function ShoppingList({ name }: Props) {
+export default function ShoppingList({ name, isCompleted }: Props) {
   const handleDelete = () => {
     Alert.alert(
       `Are you sure, you wanna delete ${name}?`,
@@ -27,14 +29,26 @@ export default function ShoppingList({ name }: Props) {
   };
 
   return (
-    <View style={styles.itemContainer}>
-      <Text style={styles.itemText}>{name}</Text>
-      <TouchableOpacity
-        onPress={handleDelete}
-        style={styles.button}
-        activeOpacity={0.8}
+    <View
+      style={[
+        styles.itemContainer,
+        isCompleted ? styles.completedContainer : undefined,
+      ]}
+    >
+      <Text
+        style={[
+          styles.itemText,
+          isCompleted ? styles.completedText : undefined,
+        ]}
       >
-        <Text style={styles.buttonText}>Delete</Text>
+        {name}
+      </Text>
+      <TouchableOpacity onPress={handleDelete} activeOpacity={0.8}>
+        <AntDesign
+          name="closecircle"
+          size={24}
+          color={isCompleted ? theme.colorGrey : theme.colorRed}
+        />
       </TouchableOpacity>
     </View>
   );
@@ -63,5 +77,17 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     letterSpacing: 1,
     textTransform: "uppercase",
+  },
+  completedContainer: {
+    backgroundColor: theme.colorLightGrey,
+    borderBottomColor: theme.colorLightGrey,
+  },
+  completedText: {
+    color: theme.colorGrey,
+    textDecorationLine: "line-through",
+    textDecorationColor: theme.colorGrey,
+  },
+  completedButton: {
+    backgroundColor: theme.colorGrey,
   },
 });
