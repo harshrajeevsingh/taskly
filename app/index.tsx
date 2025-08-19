@@ -1,4 +1,4 @@
-import { StyleSheet, TextInput, View } from "react-native";
+import { StyleSheet, TextInput, FlatList, View, Text } from "react-native";
 import { theme } from "../theme";
 import ShoppingList from "../components/ShoppingList";
 import { useState } from "react";
@@ -14,7 +14,7 @@ const shoppingList: ShoppinglListItemType[] = [
   { id: "3", name: "Biscuit" },
 ];
 export default function App() {
-  const [lists, setLists] = useState(shoppingList);
+  const [lists, setLists] = useState<ShoppinglListItemType[]>(shoppingList);
   const [value, setValue] = useState<string>("");
 
   const handleSubmit = () => {
@@ -29,19 +29,28 @@ export default function App() {
   };
 
   return (
-    <View style={styles.container}>
-      <TextInput
-        placeholder="Eg, Coffee"
-        style={styles.textInput}
-        returnKeyType="done"
-        value={value}
-        onChangeText={setValue}
-        onSubmitEditing={handleSubmit}
-      />
-      {lists.map(({ id, name }) => (
-        <ShoppingList key={id} name={name} />
-      ))}
-    </View>
+    <FlatList
+      style={styles.container}
+      contentContainerStyle={styles.contentContainer}
+      stickyHeaderIndices={[0]}
+      data={lists}
+      ListEmptyComponent={
+        <View style={styles.listEmptyContainer}>
+          <Text>Your Shopping list is empty</Text>
+        </View>
+      }
+      renderItem={({ item }) => <ShoppingList name={item.name} />}
+      ListHeaderComponent={
+        <TextInput
+          placeholder="Eg, Coffee"
+          style={styles.textInput}
+          returnKeyType="done"
+          value={value}
+          onChangeText={setValue}
+          onSubmitEditing={handleSubmit}
+        />
+      }
+    />
   );
 }
 
@@ -51,13 +60,22 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colorWhite,
     paddingTop: 12,
   },
+  contentContainer: {
+    paddingBottom: 24,
+  },
   textInput: {
     borderWidth: 2,
+    backgroundColor: theme.colorWhite,
     borderColor: theme.colorLightGrey,
     padding: 12,
     marginBottom: 12,
     marginHorizontal: 12,
     borderRadius: 50,
     fontSize: 18,
+  },
+  listEmptyContainer: {
+    justifyContent: "center",
+    alignItems: "center",
+    marginVertical: 18,
   },
 });
