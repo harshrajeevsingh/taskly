@@ -6,9 +6,10 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { theme } from "../theme";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
+
+import { theme } from "../theme";
 
 type Props = {
   name: string;
@@ -103,7 +104,7 @@ const styles = StyleSheet.create({
   },
   completedContainer: {
     backgroundColor: theme.colorLightGrey,
-    borderBottomColor: theme.colorLightGrey,
+    borderBottomColor: theme.colorGrey,
   },
   completedText: {
     color: theme.colorGrey,
