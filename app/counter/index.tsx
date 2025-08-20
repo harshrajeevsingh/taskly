@@ -1,9 +1,41 @@
+import { useEffect, useState } from "react";
 import { Text, View, StyleSheet, TouchableOpacity, Alert } from "react-native";
 import * as Notifications from "expo-notifications";
+import { intervalToDuration, isBefore } from "date-fns";
+
 import { registerForPushNotificationsAsync } from "../../utils/registerForPushNotifications";
 import { theme } from "../../theme";
+import { TimeSegment } from "../../components/TimeSegment";
+
+export type CountdownStatus = {
+  isOverdue: boolean;
+  distance: ReturnType<typeof intervalToDuration>;
+};
+
+// 10 seconds from now
+const timestamp = Date.now() + 10 * 1000;
 
 export default function CounterScreen() {
+  const [status, setStatus] = useState<CountdownStatus>({
+    isOverdue: false,
+    distance: {},
+  });
+
+  useEffect(() => {
+    const idx = setInterval(() => {
+      const isOverdue = isBefore(timestamp, Date.now());
+      const distance = intervalToDuration(
+        isOverdue
+          ? { end: Date.now(), start: timestamp }
+          : { start: Date.now(), end: timestamp },
+      );
+
+      setStatus({ isOverdue, distance });
+    }, 1000);
+
+    return () => clearInterval(idx);
+  }, []);
+
   const scheduleNotification = async () => {
     const result = await registerForPushNotificationsAsync();
     if (result === "granted") {
@@ -23,13 +55,45 @@ export default function CounterScreen() {
   };
 
   return (
-    <View style={styles.container}>
+    <View
+      style={[
+        styles.container,
+        status.isOverdue ? styles.containerLate : undefined,
+      ]}
+    >
+      {!status.isOverdue ? (
+        <Text style={[styles.heading]}>Thing due in</Text>
+      ) : (
+        <Text style={[styles.heading, styles.whiteText]}>Thing overdue by</Text>
+      )}
+      <View style={styles.row}>
+        <TimeSegment
+          unit="Days"
+          number={status.distance?.days ?? 0}
+          textStyle={status.isOverdue ? styles.whiteText : undefined}
+        />
+        <TimeSegment
+          unit="Hours"
+          number={status.distance?.hours ?? 0}
+          textStyle={status.isOverdue ? styles.whiteText : undefined}
+        />
+        <TimeSegment
+          unit="Minutes"
+          number={status.distance?.minutes ?? 0}
+          textStyle={status.isOverdue ? styles.whiteText : undefined}
+        />
+        <TimeSegment
+          unit="Seconds"
+          number={status.distance?.seconds ?? 0}
+          textStyle={status.isOverdue ? styles.whiteText : undefined}
+        />
+      </View>
       <TouchableOpacity
         onPress={scheduleNotification}
         style={styles.button}
         activeOpacity={0.8}
       >
-        <Text style={styles.buttonText}>schedule Notification</Text>
+        <Text style={styles.buttonText}>I&apos;ve done the thing!</Text>
       </TouchableOpacity>
     </View>
   );
@@ -40,7 +104,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#fff",
+    backgroundColor: theme.colorWhite,
   },
   button: {
     backgroundColor: theme.colorBlack,
@@ -52,5 +116,21 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     textTransform: "uppercase",
     letterSpacing: 1,
+  },
+  row: {
+    flexDirection: "row",
+    marginBottom: 24,
+  },
+  heading: {
+    fontSize: 24,
+    fontWeight: "bold",
+    marginBottom: 24,
+    color: theme.colorBlack,
+  },
+  containerLate: {
+    backgroundColor: theme.colorRed,
+  },
+  whiteText: {
+    color: theme.colorWhite,
   },
 });
